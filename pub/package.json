@@ -12,15 +12,15 @@
   "description": "",
   "homepage": "https://github.com/corno/pareto-core#readme",
   "license": "ISC",
-  "name": "pareto-internals",
+  "name": "pareto-core-internals",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/corno/pareto-internals.git"
+    "url": "git+https://github.com/corno/pareto-core-internals.git"
   },
   "types": "dist/index.d.ts",
   "version": "0.1.0",
   "dependencies": {
     "pareto-core-types": "^0.2.0"
   },
-  "content-fingerprint": "c85ecc07ed2f20ab65c9c737a9b3e13c82afddd5"
+  "content-fingerprint": "dd91300b71dd45e56eb0319c338fa86edf43fc97"
 }
