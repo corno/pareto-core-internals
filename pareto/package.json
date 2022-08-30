@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "analysePackage": "./scripts/analysePackage.sh",
+    "analyseTypeScript": "./scripts/analyseAllTypeScriptProjects.sh",
+    "update2latestBuildEnvironment": "./scripts/update2latestBuildEnvironment.sh",
+
+    "dev-update-dependencies": "./scripts/updatePackage.sh dev",
+
+
+    "update-dependencies": "./scripts/updatePackage.sh pub && ./scripts/updatePackage.sh test",
+    "pub is changed": "./scripts/isPackageChanged.sh",
+    "publish": "./scripts/publish.sh",
+
+    "buildAndTest": "./scripts/buildAndTest.sh"
+  },
+  "dependencies": {
+    "pareto-buildenvironment": "^0.0.0"
+  }
+}
