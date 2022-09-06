@@ -6,29 +6,35 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
         throw new Error("invalid input in 'createArray'")
     }
     return {
-        map: <NT>(callback: (entry: T) => NT) => {
+        forEach: ($c) => {
             return wrapRawArray(source.map((entry) => {
-                return callback(entry)
+                return $c(entry)
+            }))
+        },
+
+        map: <NT>($c: (entry: T) => NT) => {
+            return wrapRawArray(source.map((entry) => {
+                return $c(entry)
             }))
         },
         reduce: <NT>(
             initialValue: NT,
-            callback: (current: NT, entry: T) => NT,
+            $c: (current: NT, entry: T) => NT,
         ) => {
             let current = initialValue
 
             source.forEach(($) => {
-                current = callback(current, $)
+                current = $c(current, $)
 
             })
             return current
         },
         filter: <NT>(
-            cb: (v: T) => NT | undefined
+            $c: (v: T) => NT | undefined
         ) => {
             const filtered: NT[] = []
             source.forEach(($) => {
-                const result = cb($)
+                const result = $c($)
                 if (result !== undefined) {
                     filtered.push(result)
                 }
@@ -40,23 +46,23 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
 
             function array<T, NT>(
                 array: T[],
-                elementCallback: ($: T) => pt.AsyncValue<NT>
+                element$c: ($: T) => pt.AsyncValue<NT>
             ): pt.AsyncValue<pt.Array<NT>> {
                 return {
-                    execute: (cb) => {
+                    execute: ($c) => {
                         const temp: NT[] = []
                         createCounter(
                             (counter) => {
                                 array.forEach((v) => {
                                     counter.increment()
-                                    elementCallback(v).execute((v) => {
+                                    element$c(v).execute((v) => {
                                         temp.push(v)
                                         counter.decrement()
                                     })
                                 })
                             },
                             () => {
-                                cb(wrapRawArray(temp))
+                                $c(wrapRawArray(temp))
                             }
                         )
                     }
