@@ -1,6 +1,6 @@
 import * as pt from "pareto-core-types"
 import { createCounter } from "../private/createCounter"
-import { wrapAsyncValueImp } from "../private/wrapAsyncValueImp"
+import { wrapAsyncValueImp } from "./wrapAsyncValueImp"
 
 
 export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionary<T> {

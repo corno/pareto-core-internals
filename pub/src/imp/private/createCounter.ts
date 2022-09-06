@@ -1,4 +1,4 @@
-import { ICounter } from "../types/x"
+import { ICounter } from "../types/Counter"
 
 
 
