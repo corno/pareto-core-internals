@@ -1,5 +1,6 @@
 import * as pt from "pareto-core-types"
-import { createCounter } from "./createCounter"
+import { createCounter } from "../imp/private/createCounter"
+import { wrapAsyncValueImp } from "../imp/private/wrapAsyncValueImp"
 
 
 export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionary<T> {
@@ -86,14 +87,14 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
                     dictionary: DictionaryAsArray<T>,
                     entryCallback: ($: T, key: string) => pt.AsyncValue<NT>
                 ): pt.AsyncValue<pt.Dictionary<NT>> {
-                    return {
-                        execute: (cb) => {
+                    return  wrapAsyncValueImp({
+                        _execute: (cb) => {
                             const temp: { [key: string]: NT } = {}
                             createCounter(
                                 (counter) => {
                                     dictionary.map(($) => {
                                         counter.increment()
-                                        entryCallback($.value, $.key).execute((nv) => {
+                                        entryCallback($.value, $.key)._execute((nv) => {
                                             temp[$.key] = nv
                                             counter.decrement()
                                         })
@@ -104,7 +105,7 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
                                 }
                             )
                         }
-                    }
+                    })
                 }
                 return imp(
                     source,

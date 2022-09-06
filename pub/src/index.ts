@@ -1,4 +1,4 @@
 
-export * from "./functions/wrapRawDictionary"
-export * from "./functions/wrapRawArray"
-export * from "./functions/flatten"
+export * from "./imp/public/wrapRawDictionary"
+export * from "./imp/public/wrapRawArray"
+export * from "./imp/public/flatten"

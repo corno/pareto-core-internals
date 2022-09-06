@@ -1,9 +1,5 @@
+import { ICounter } from "../types/x"
 
-
-export type ICounter = {
-    readonly "increment": () => void
-    readonly "decrement": () => void
-}
 
 
 

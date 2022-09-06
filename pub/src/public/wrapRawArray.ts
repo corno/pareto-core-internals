@@ -1,5 +1,6 @@
 import * as pt from "pareto-core-types"
-import { createCounter } from "./createCounter"
+import { createCounter } from "../imp/private/createCounter"
+import { wrapAsyncValueImp } from "../imp/private/wrapAsyncValueImp"
 
 export function wrapRawArray<T>(source: T[]): pt.Array<T> {
     if (!(source instanceof Array)) {
@@ -48,14 +49,14 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
                 array: T[],
                 element$c: ($: T) => pt.AsyncValue<NT>
             ): pt.AsyncValue<pt.Array<NT>> {
-                return {
-                    execute: ($c) => {
+                return wrapAsyncValueImp({
+                    _execute: ($c) => {
                         const temp: NT[] = []
                         createCounter(
                             (counter) => {
                                 array.forEach((v) => {
                                     counter.increment()
-                                    element$c(v).execute((v) => {
+                                    element$c(v)._execute((v) => {
                                         temp.push(v)
                                         counter.decrement()
                                     })
@@ -66,7 +67,7 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
                             }
                         )
                     }
-                }
+                })
             }
             return array(source, $c)
         },

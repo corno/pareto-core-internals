@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "pareto-core-lib": "^0.9.0"
+    "pareto-core-lib": "^0.10.0"
   }
 }
