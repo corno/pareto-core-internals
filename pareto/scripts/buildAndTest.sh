@@ -3,6 +3,11 @@
 scriptDir=`realpath $(dirname "$0")`
 rootDir="$scriptDir/../.."
 
+
+
+root="`cd "$rootDir";pwd`" # the resolved path to the root dir of the project
+rootName=`basename $root`
+
 if [ -d "$rootDir/dev" ]
 then
     $scriptDir/buildDevPackage.sh && \
@@ -13,8 +18,9 @@ fi \
 
 
 $scriptDir/buildPubAndTestPackages.sh && \
-if [ -d "$rootDir/test" ]
+if [[ $rootName == api-* || $rootName == pareto-core-* ]]
 then
-    node $rootDir/test/dist/bin/index.js $rootDir/test/data
-fi \
-
+    echo "$rootName; no testing for api"
+else
+    node $rootDir/test/dist/bin/test.js $rootDir/test/data
+fi
