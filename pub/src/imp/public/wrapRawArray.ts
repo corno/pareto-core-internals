@@ -8,67 +8,85 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
         throw new Error("invalid input in 'createArray'")
     }
     return {
-        forEach: ($c) => {
-            return wrapRawArray(source.map((entry) => {
-                return $c(entry)
-            }))
+        forEach: ($i) => {
+            source.forEach(($) => {
+                $i($)
+            })
         },
 
-        map: <NT>($c: (entry: T) => NT) => {
+        map: <NT>(
+            $v: (entry: T) => NT
+        ) => {
             return wrapRawArray(source.map((entry) => {
-                return $c(entry)
+                return $v(entry)
             }))
         },
         reduce: <NT>(
-            initialValue: NT,
-            $c: (current: NT, entry: T) => NT,
+            $: NT,
+            $v: (current: NT, entry: T) => NT,
         ) => {
-            let current = initialValue
+            let current = $
 
             source.forEach(($) => {
-                current = $c(current, $)
+                current = $v(current, $)
 
             })
             return current
         },
         filter: <NT>(
-            $c: (v: T) => NT | undefined
+            $v: (v: T) => NT | undefined
         ) => {
             const filtered: NT[] = []
             source.forEach(($) => {
-                const result = $c($)
+                const result = $v($)
                 if (result !== undefined) {
                     filtered.push(result)
                 }
             })
             return wrapRawArray(filtered)
         },
-        asyncMap: ($c) => {
+        asyncMap: ($v) => {
+            // const elements = source.map($v)
+            // let _isGuaranteedToReturnAResult = true
+            // source.forEach(($) => {
+            //     if ($)
+            // })
             function array<T, NT>(
                 array: T[],
-                element$c: ($: T) => pt.AsyncValue<NT>
-            ): AsyncValueImp<pt.Array<NT>> {
-                return {
-                    _execute: ($c) => {
-                        const temp: NT[] = []
-                        createCounter(
-                            (counter) => {
-                                array.forEach((v) => {
-                                    counter.increment()
-                                    element$c(v)._execute((v) => {
-                                        temp.push(v)
-                                        counter.decrement()
-                                    })
-                                })
-                            },
-                            () => {
-                                $c(wrapRawArray(temp))
-                            }
-                        )
+                $v: ($: T) => pt.AsyncValue<NT>
+            ): pt.AsyncValue<pt.Array<NT>> {
+                const mapped = array.map($v)
+
+                let _isGuaranteedToReturnAResult = true
+                mapped.forEach(($) => {
+                    if (!$._isGuaranteedToReturnAResult) {
+                        _isGuaranteedToReturnAResult = false
                     }
-                }
+                })
+                return wrapAsyncValueImp(
+                    _isGuaranteedToReturnAResult,
+                    {
+                        _execute: ($c) => {
+                            const temp: NT[] = []
+                            createCounter(
+                                (counter) => {
+                                    mapped.forEach((v) => {
+                                        counter.increment()
+                                        v._execute((v) => {
+                                            temp.push(v)
+                                            counter.decrement()
+                                        })
+                                    })
+                                },
+                                () => {
+                                    $c(wrapRawArray(temp))
+                                }
+                            )
+                        }
+                    },
+                )
             }
-            return wrapAsyncValueImp(array(source, $c))
+            return array(source, $v)
         },
     }
 }

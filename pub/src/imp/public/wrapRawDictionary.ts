@@ -21,11 +21,13 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
     function createDictionaryImp<X>(source: DictionaryAsArray<X>): pt.Dictionary<X> {
 
         return {
-            map: <NT>(callback: (entry: X, key: string) => NT) => {
+            map: <NT>(
+                $v: (entry: X, key: string) => NT
+            ) => {
                 return createDictionaryImp(source.map(($) => {
                     return {
                         key: $.key,
-                        value: callback($.value, $.key)
+                        value: $v($.value, $.key)
                     }
                 }))
             },
@@ -56,11 +58,11 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
             //     })
             // },
             filter: <NT>(
-                cb: (v: X, key: string) => NT | undefined
+                $v: (v: X, key: string) => NT | undefined
             ) => {
                 const filtered: KeyValuePair<NT>[] = []
                 source.forEach(($) => {
-                    const result = cb($.value, $.key)
+                    const result = $v($.value, $.key)
                     if (result !== undefined) {
                         filtered.push({
                             key: $.key,
@@ -72,44 +74,59 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
             },
             reduce: <NT>(
                 initialValue: NT,
-                callback: (current: NT, entry: X, key: string) => NT,
+                $v: (current: NT, entry: X, key: string) => NT,
             ) => {
                 let current = initialValue
 
                 source.forEach(($) => {
-                    current = callback(current, $.value, $.key)
+                    current = $v(current, $.value, $.key)
 
                 })
                 return current
             },
-            asyncMap: ($c) => {
+            asyncMap: ($v) => {
                 function imp<T, NT>(
                     dictionary: DictionaryAsArray<T>,
-                    entryCallback: ($: T, key: string) => pt.AsyncValue<NT>
+                    $v: ($: T, key: string) => pt.AsyncValue<NT>
                 ): pt.AsyncValue<pt.Dictionary<NT>> {
-                    return wrapAsyncValueImp({
-                        _execute: (cb) => {
-                            const temp: { [key: string]: NT } = {}
-                            createCounter(
-                                (counter) => {
-                                    dictionary.map(($) => {
-                                        counter.increment()
-                                        entryCallback($.value, $.key)._execute((nv) => {
-                                            temp[$.key] = nv
-                                            counter.decrement()
-                                        })
-                                    })
-                                },
-                                () => {
-                                    cb(wrapRawDictionary(temp))
-                                }
-                            )
+                    const mapped = dictionary.map(($) => {
+                        return {
+                            key: $.key,
+                            value: $v($.value, $.key),
                         }
                     })
+                    let _isGuaranteedToReturnAResult = true
+                    mapped.forEach(($) => {
+                        if (!$.value._isGuaranteedToReturnAResult) {
+                            _isGuaranteedToReturnAResult = false
+                        }
+                    })
+                    return wrapAsyncValueImp(
+                        _isGuaranteedToReturnAResult,
+                        {
+                            _execute: (cb) => {
+                                const temp: { [key: string]: NT } = {}
+                                createCounter(
+                                    (counter) => {
+                                        mapped.map(($) => {
+                                            counter.increment()
+                                            $.value._execute((nv) => {
+                                                temp[$.key] = nv
+                                                counter.decrement()
+                                            })
+                                        })
+                                    },
+                                    () => {
+                                        cb(wrapRawDictionary(temp))
+                                    }
+                                )
+                            }
+                        }
+                    )
                 }
                 return imp(
                     source,
-                    $c,
+                    $v,
                 )
 
             }
