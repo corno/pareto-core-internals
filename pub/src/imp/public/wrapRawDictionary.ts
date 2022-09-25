@@ -103,24 +103,22 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
                     })
                     return wrapAsyncValueImp(
                         _isGuaranteedToReturnAResult,
-                        {
-                            _execute: (cb) => {
-                                const temp: { [key: string]: NT } = {}
-                                createCounter(
-                                    (counter) => {
-                                        mapped.map(($) => {
-                                            counter.increment()
-                                            $.value._execute((nv) => {
-                                                temp[$.key] = nv
-                                                counter.decrement()
-                                            })
+                        (cb) => {
+                            const temp: { [key: string]: NT } = {}
+                            createCounter(
+                                (counter) => {
+                                    mapped.map(($) => {
+                                        counter.increment()
+                                        $.value._execute((nv) => {
+                                            temp[$.key] = nv
+                                            counter.decrement()
                                         })
-                                    },
-                                    () => {
-                                        cb(wrapRawDictionary(temp))
-                                    }
-                                )
-                            }
+                                    })
+                                },
+                                () => {
+                                    cb(wrapRawDictionary(temp))
+                                }
+                            )
                         }
                     )
                 }

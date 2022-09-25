@@ -1,7 +1,7 @@
 import * as pt from "pareto-core-types"
 import { createCounter } from "../private/createCounter"
 import { wrapAsyncValueImp } from "./wrapAsyncValueImp"
-import { AsyncValueImp } from "../types/AsyncValueImp"
+import { Execute } from "../types/Execute"
 
 export function wrapRawArray<T>(source: T[]): pt.Array<T> {
     if (!(source instanceof Array)) {
@@ -65,24 +65,22 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
                 })
                 return wrapAsyncValueImp(
                     _isGuaranteedToReturnAResult,
-                    {
-                        _execute: ($c) => {
-                            const temp: NT[] = []
-                            createCounter(
-                                (counter) => {
-                                    mapped.forEach((v) => {
-                                        counter.increment()
-                                        v._execute((v) => {
-                                            temp.push(v)
-                                            counter.decrement()
-                                        })
+                    ($c) => {
+                        const temp: NT[] = []
+                        createCounter(
+                            (counter) => {
+                                mapped.forEach((v) => {
+                                    counter.increment()
+                                    v._execute((v) => {
+                                        temp.push(v)
+                                        counter.decrement()
                                     })
-                                },
-                                () => {
-                                    $c(wrapRawArray(temp))
-                                }
-                            )
-                        }
+                                })
+                            },
+                            () => {
+                                $c(wrapRawArray(temp))
+                            }
+                        )
                     },
                 )
             }
