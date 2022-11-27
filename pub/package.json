@@ -20,7 +20,7 @@
   "types": "dist/index.d.ts",
   "version": "0.9.0",
   "dependencies": {
-    "pareto-core-types": "^0.7.0"
+    "pareto-core-types": "^0.9.0"
   },
-  "content-fingerprint": "8809787efb519906a361d92614ae3cc0b6782188"
+  "content-fingerprint": "e9a1c55cb2a59b3d9e64c756ac3fba90071fcd7d"
 }

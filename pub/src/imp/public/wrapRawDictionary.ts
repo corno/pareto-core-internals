@@ -31,32 +31,32 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
                     }
                 }))
             },
-            // forEach: (
-            //     isFirstAfterSecond,
-            //     callback
-            // ) => {
-            //     const sortedKeys = source.map((entry, position) => {
-            //         return {
-            //             key: entry.key,
-            //             position: position
-            //         }
-            //     }).sort(
-            //         (a, b) => {
-            //             if(isFirstAfterSecond(a.key, b.key)) {
-            //                 return 1
-            //             } else {
-            //                 if (isFirstAfterSecond(b.key, a.key)) {
-            //                     return -1
-            //                 } else {
-            //                     return 0
-            //                 }
-            //             }
-            //         }
-            //     )
-            //     sortedKeys.forEach((sorted) => {
-            //         callback(source[sorted.position].value, sorted.key)
-            //     })
-            // },
+            forEach: (
+                isFirstBeforeSecond,
+                callback
+            ) => {
+                const sortedKeys = source.map((entry, position) => {
+                    return {
+                        key: entry.key,
+                        position: position
+                    }
+                }).sort(
+                    (a, b) => {
+                        if(isFirstBeforeSecond(a.key, b.key)) {
+                            return -1
+                        } else {
+                            if (isFirstBeforeSecond(b.key, a.key)) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        }
+                    }
+                )
+                sortedKeys.forEach((sorted) => {
+                    callback(source[sorted.position].value, sorted.key)
+                })
+            },
             filter: <NT>(
                 $v: (v: X, key: string) => NT | undefined
             ) => {
