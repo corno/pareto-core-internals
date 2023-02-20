@@ -59,7 +59,7 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
                 $i($)
             })
         },
-        __length: () => {
+        __getLength: () => {
             return data.length
         },
         __getElementAt: (index) => {
