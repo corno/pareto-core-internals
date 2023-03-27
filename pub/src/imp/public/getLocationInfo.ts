@@ -3,8 +3,8 @@ import * as path from "path"
 
 export type SourceLocation = {
     'file': string,
-    'line': string,
-    'column': string,
+    'line': number,
+    'column': number,
 }
 
 export function getLocationInfo(depth: number): SourceLocation {
@@ -40,7 +40,7 @@ export function getLocationInfo(depth: number): SourceLocation {
     }
     return {
         'file': split[0],
-        'line': split[1],
-        'column': split[2],
+        'line': Number(split[1]),
+        'column': Number(split[2]),
     }
 }
