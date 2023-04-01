@@ -8,3 +8,4 @@ export * from "./imp/public/changeContext"
 export * from "./imp/public/getLocationInfo"
 
 export * from "./imp/public/wrapAsyncValueImp"
+export * from "./imp/public/optional"
