@@ -4,128 +4,134 @@ import { panic } from "./panic"
 import { wrapAsyncValueImp } from "./wrapAsyncValueImp"
 
 
-export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionary<T> {
+type KeyValuePair<T> = { key: string, value: T }
 
+type DictionaryAsArray<T> = KeyValuePair<T>[]
 
-    type KeyValuePair<T> = { key: string, value: T }
-
-    type DictionaryAsArray<T> = KeyValuePair<T>[]
-
-
-    function createDictionaryImp<X>(source: DictionaryAsArray<X>): pt.Dictionary<X> {
-
-        return {
-            map: <NT>(
-                $v: (entry: X) => NT
-            ) => {
-                return createDictionaryImp(source.map(($) => {
-                    return {
-                        key: $.key,
-                        value: $v($.value)
-                    }
-                }))
-            },
-            asyncMap: ($v) => {
-                function imp<T, NT>(
-                    dictionary: DictionaryAsArray<T>,
-                    $v: ($: T) => pt.AsyncValue<NT>
-                ): pt.AsyncValue<pt.Dictionary<NT>> {
-                    const mapped = dictionary.map(($) => {
-                        return {
-                            key: $.key,
-                            value: $v($.value),
-                        }
-                    })
-                    mapped.forEach(($) => {
-                    })
-                    return wrapAsyncValueImp(
-                        (cb) => {
-                            const temp: { [key: string]: NT } = {}
-                            createCounter(
-                                (counter) => {
-                                    mapped.map(($) => {
-                                        counter.increment()
-                                        $.value.__execute((nv) => {
-                                            temp[$.key] = nv
-                                            counter.decrement()
-                                        })
-                                    })
-                                },
-                                () => {
-                                    cb(wrapRawDictionary(temp))
-                                }
-                            )
+export class Dictionary<T> implements pt.Dictionary<T> {
+    private source: DictionaryAsArray<T>
+    constructor(source: DictionaryAsArray<T>) {
+        this.source = source
+    }
+    public map<NT>(
+        $v: (entry: T) => NT
+    ) {
+        return new Dictionary<NT>(this.source.map(($) => {
+            return {
+                key: $.key,
+                value: $v($.value)
+            }
+        }))
+    }
+    asyncMap<NT>($v: ($: T) => pt.AsyncValue<NT>) {
+        function imp<T, NT>(
+            dictionary: DictionaryAsArray<T>,
+            $v: ($: T) => pt.AsyncValue<NT>
+        ): pt.AsyncValue<pt.Dictionary<NT>> {
+            const mapped = dictionary.map(($) => {
+                return {
+                    key: $.key,
+                    value: $v($.value),
+                }
+            })
+            mapped.forEach(($) => {
+            })
+            return wrapAsyncValueImp(
+                (cb) => {
+                    const temp: { [key: string]: NT } = {}
+                    createCounter(
+                        (counter) => {
+                            mapped.map(($) => {
+                                counter.increment()
+                                $.value.__execute((nv) => {
+                                    temp[$.key] = nv
+                                    counter.decrement()
+                                })
+                            })
+                        },
+                        () => {
+                            cb(wrapRawDictionary(temp))
                         }
                     )
                 }
-                return imp(
-                    source,
-                    $v,
-                )
-
-            },
-
-            ///////
-            __mapWithKey: <NT>(
-                $v: (entry: X, key: string) => NT
-            ) => {
-                return createDictionaryImp(source.map(($) => {
-                    return {
-                        key: $.key,
-                        value: $v($.value, $.key),
-                    }
-                }))
-            },
-            __forEach: (
-                isFirstBeforeSecond,
-                callback
-            ) => {
-                const sortedKeys = source.map((entry, position) => {
-                    return {
-                        key: entry.key,
-                        position: position
-                    }
-                }).sort(
-                    (a, b) => {
-                        if (isFirstBeforeSecond(a.key, b.key)) {
-                            return -1
-                        } else {
-                            if (isFirstBeforeSecond(b.key, a.key)) {
-                                return 1
-                            } else {
-                                return 0
-                            }
-                        }
-                    }
-                )
-                sortedKeys.forEach((sorted) => {
-                    callback(source[sorted.position].value, sorted.key)
-                })
-            },
-            __unsafeGetEntry: (key) => {
-                for (let i = 0; i !== source.length; i += 1) {
-                    const element = source[i]
-                    if (element.key === key) {
-                        return element.value
-                    }
-                }
-                panic(`entry '${key}' not found`)
-            },
-            __getEntry: (
-                key,
-                exists,
-                nonExists,
-            ) => {
-                for (let i = 0; i !== source.length; i += 1) {
-                    const element = source[i]
-                    if (element.key === key) {
-                        return exists(element.value)
-                    }
-                }
-                return nonExists()
-            },
+            )
         }
+        return imp<T, NT>(
+            this.source,
+            $v,
+        )
+
     }
+
+    ///////
+    __mapWithKey<NT>(
+        $v: (entry: T, key: string) => NT
+    ) {
+        return new Dictionary(this.source.map(($) => {
+            return {
+                key: $.key,
+                value: $v($.value, $.key),
+            }
+        }))
+    }
+    __forEach(
+        isFirstBeforeSecond: (a: string, b: string) => boolean,
+        callback: ($: T, key: string) => void,
+    ) {
+        const sortedKeys = this.source.map((entry, position) => {
+            return {
+                key: entry.key,
+                position: position
+            }
+        }).sort(
+            (a, b) => {
+                if (isFirstBeforeSecond(a.key, b.key)) {
+                    return -1
+                } else {
+                    if (isFirstBeforeSecond(b.key, a.key)) {
+                        return 1
+                    } else {
+                        return 0
+                    }
+                }
+            }
+        )
+        sortedKeys.forEach((sorted) => {
+            callback(this.source[sorted.position].value, sorted.key)
+        })
+    }
+    __unsafeGetEntry(key: string) {
+        for (let i = 0; i !== this.source.length; i += 1) {
+            const element = this.source[i]
+            if (element.key === key) {
+                return element.value
+            }
+        }
+        panic(`entry '${key}' not found`)
+    }
+    __getEntry<NT>(
+        key: string,
+        exists: ($: T) => NT,
+        nonExists: () => NT,
+    ) {
+        for (let i = 0; i !== this.source.length; i += 1) {
+            const element = this.source[i]
+            if (element.key === key) {
+                return exists(element.value)
+            }
+        }
+        return nonExists()
+    }
+
+}
+
+
+
+export function wrapRawDictionary<T>(sourceX: { [key: string]: T }): pt.Dictionary<T> {
+
+
+
+
 
     //first we clone the source data so that changes to that source will have no impact on this implementation.
     //only works if the set does not become extremely large
@@ -137,6 +143,6 @@ export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionar
         })
         return imp
     }
-    const daa = createDictionaryAsArray(source)
-    return createDictionaryImp(daa)
+    const daa = createDictionaryAsArray(sourceX)
+    return new Dictionary(daa)
 }
