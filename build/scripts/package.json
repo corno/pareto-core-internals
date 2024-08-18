@@ -1,5 +1,7 @@
 {
   "scripts": {
-    "publish": "./publish.sh"
+    "update 2 latest": "node ../node_modules/npm-updatedependencies2latest/dist/index.js ./pub dependencies",
+    "publish patch": "./publish.sh patch",
+    "publish minor": "./publish.sh minor"
   }
 }

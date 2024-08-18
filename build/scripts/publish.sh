@@ -3,6 +3,12 @@
 scriptDir=`realpath $(dirname "$0")`
 rootDir="$scriptDir/../.."
 
+if [ -z "$1" ]
+  then
+    echo "No generation supplied"
+    exit 1
+fi
+
 #the scriptsdir will be deleted, change to the root
 cd "$rootDir" && \
 
@@ -21,5 +27,5 @@ popd && \
 git diff --exit-code && git log origin/master..master --exit-code && \
 
 pushd "$rootDir/pub" > /dev/null && \
-npm version patch && \
+npm version $1 && \
 npm publish
