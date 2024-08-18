@@ -1,8 +1,15 @@
 import { ICounter } from "../types/Counter"
 
 
-
-
+/**
+ * this function provides a callback with a counter as parameter
+ * when the counter reaches 0, the onEnd callback is called
+ * 
+ * this function is specifically useful for async map functions
+ * 
+ * @param callback this callback creates a scope within which the counter is provided
+ * @param onEnd this callback will be called when the counter reaches 0
+ */
 export function createCounter(
     callback: ($: ICounter) => void,
     onEnd: () => void
