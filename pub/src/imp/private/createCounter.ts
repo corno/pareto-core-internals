@@ -38,6 +38,9 @@ export function createCounter(
 
         },
         decrement: () => {
+            if (counter === 0) {
+                throw new Error("CORE: decrement while counter is 0")
+            }
             counter -= 1
             wrapup()
         },
