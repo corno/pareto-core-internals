@@ -9,4 +9,5 @@ export * from "./imp/public/switchState"
 export * from "./imp/public/getLocationInfo"
 
 export * from "./imp/public/wrapAsyncValueImp"
-export * from "./imp/public/optional"
+export * from "./imp/public/set"
+export * from "./imp/public/notSet"

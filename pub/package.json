@@ -1,29 +1,32 @@
 {
+  "name": "pareto-core-internals",
+  "version": "0.16.0",
+  "license": "ISC",
+  "description": "",
   "author": "Corno",
-  "bin": {},
-  "files": [
-    "dist"
+  "keywords": [
+    "pareto",
+    "internals",
+    "wrapRawDictionary",
+    "wrapRawArray"
   ],
-  "keywords": [],
-  "main": "./dist/index.js",
+  "homepage": "https://github.com/corno/pareto-core#readme",
   "bugs": {
     "url": "https://github.com/corno/pareto-core/issues"
   },
-  "description": "",
-  "homepage": "https://github.com/corno/pareto-core#readme",
-  "license": "ISC",
-  "name": "pareto-core-internals",
+  "dependencies": {
+    "pareto-core-types": "^0.16.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.3"
+  },
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/corno/pareto-core-internals.git"
-  },
-  "types": "dist/index.d.ts",
-  "version": "0.16.0",
-  "dependencies": {
-    "pareto-core-types": "^0.16.0"
-  },
-  "devDependencies": {
-    "@types/node": "^18.15.3",
-    "npm-updatedependencies2latest": "^0.0.17"
   }
 }

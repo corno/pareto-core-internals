@@ -3,8 +3,10 @@ import { createCounter } from "../private/createCounter"
 import { wrapAsyncValueImp } from "./wrapAsyncValueImp"
 import { Execute } from "../types/Execute"
 
-
-export class Array<T> implements pt.Array<T> {
+/**
+ * this is an implementation, not public by design
+ */
+class Array<T> implements pt.Array<T> {
     private data: T[]
     constructor(data: T[]) {
         this.data = data
@@ -67,6 +69,14 @@ export class Array<T> implements pt.Array<T> {
 
 }
 
+
+/**
+ * returns a Pareto array
+ * why is this not the constructor? to call a constructor, you have to use the keyword 'new'. Pareto doesn't use the concept of a class so that keyword should be avoided
+
+ * @param source An array literal
+ * @returns 
+ */
 export function wrapRawArray<T>(source: T[]): pt.Array<T> {
     const data = source.slice() //create a copy
     if (!(data instanceof Array)) {

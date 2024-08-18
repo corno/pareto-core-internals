@@ -2,13 +2,17 @@ import * as pt from "pareto-core-types"
 import { createCounter } from "../private/createCounter"
 import { panic } from "./panic"
 import { wrapAsyncValueImp } from "./wrapAsyncValueImp"
-
+import { set } from "./set"
+import { notSet } from "./notSet"
 
 type KeyValuePair<T> = { key: string, value: T }
 
 type DictionaryAsArray<T> = KeyValuePair<T>[]
 
-export class Dictionary<T> implements pt.Dictionary<T> {
+/**
+ * this is an implementation, not public by design
+ */
+class Dictionary<T> implements pt.Dictionary<T> {
     private source: DictionaryAsArray<T>
     constructor(source: DictionaryAsArray<T>) {
         this.source = source
@@ -63,7 +67,6 @@ export class Dictionary<T> implements pt.Dictionary<T> {
 
     }
 
-    ///////
     __mapWithKey<NT>(
         $v: (entry: T, key: string) => NT
     ) {
@@ -74,6 +77,7 @@ export class Dictionary<T> implements pt.Dictionary<T> {
             }
         }))
     }
+
     __forEach(
         isFirstBeforeSecond: (a: string, b: string) => boolean,
         callback: ($: T, key: string) => void,
@@ -100,6 +104,17 @@ export class Dictionary<T> implements pt.Dictionary<T> {
             callback(this.source[sorted.position].value, sorted.key)
         })
     }
+
+    __getEntryOrPanic(key: string) {
+        for (let i = 0; i !== this.source.length; i += 1) {
+            const element = this.source[i]
+            if (element.key === key) {
+                return element.value
+            }
+        }
+        panic(`entry '${key}' not found`)
+    }
+
     __unsafeGetEntry(key: string) {
         for (let i = 0; i !== this.source.length; i += 1) {
             const element = this.source[i]
@@ -109,6 +124,7 @@ export class Dictionary<T> implements pt.Dictionary<T> {
         }
         panic(`entry '${key}' not found`)
     }
+
     __getEntry<NT>(
         key: string,
         exists: ($: T) => NT,
@@ -123,15 +139,28 @@ export class Dictionary<T> implements pt.Dictionary<T> {
         return nonExists()
     }
 
+    __getOptionalEntry(
+        key: string,
+    ): pt.OptionalValue<T> {
+        for (let i = 0; i !== this.source.length; i += 1) {
+            const element = this.source[i]
+            if (element.key === key) {
+                return set(element.value)
+            }
+        }
+        return notSet()
+    }
+
 }
 
-
-
-export function wrapRawDictionary<T>(sourceX: { [key: string]: T }): pt.Dictionary<T> {
-
-
-
-
+/**
+ * returns a Pareto dictionary
+ * 
+ * why is this not the constructor? to call a constructor, you have to use the keyword 'new'. Pareto doesn't use the concept of a class so that keyword should be avoided
+ * @param source An object literal
+ * @returns 
+ */
+export function wrapRawDictionary<T>(source: { [key: string]: T }): pt.Dictionary<T> {
 
     //first we clone the source data so that changes to that source will have no impact on this implementation.
     //only works if the set does not become extremely large
@@ -143,6 +172,6 @@ export function wrapRawDictionary<T>(sourceX: { [key: string]: T }): pt.Dictiona
         })
         return imp
     }
-    const daa = createDictionaryAsArray(sourceX)
+    const daa = createDictionaryAsArray(source)
     return new Dictionary(daa)
 }
