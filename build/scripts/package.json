@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "publish": "./publish.sh"
+  }
+}
