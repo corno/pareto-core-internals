@@ -20,7 +20,7 @@
   "types": "dist/index.d.ts",
   "version": "0.16.0",
   "dependencies": {
-    "pareto-core-types": "^0.15.2"
+    "pareto-core-types": "^0.16.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.3",
