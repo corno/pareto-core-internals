@@ -6,7 +6,7 @@ import { ICounter } from "../types/Counter"
 export function createCounter(
     callback: ($: ICounter) => void,
     onEnd: () => void
-) {
+): void {
 
     let counter = 0
 
