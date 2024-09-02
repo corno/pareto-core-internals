@@ -1,10 +1,9 @@
 {
   "name": "pareto-core-internals",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "license": "ISC",
   "description": "",
   "author": "Corno",
-
   "keywords": [
     "pareto",
     "internals",
@@ -15,20 +14,17 @@
   "bugs": {
     "url": "https://github.com/corno/pareto-core/issues"
   },
-
   "dependencies": {
     "pareto-core-types": "^0.16.1"
   },
   "devDependencies": {
     "@types/node": "^18.15.3"
   },
-
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/corno/pareto-core-internals.git"
