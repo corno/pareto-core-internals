@@ -1,5 +1,7 @@
 import * as pt from "pareto-core-types"
 
+import { OptionalValue } from "pareto-core-types"
+
 /**
  * this is an implementation, not public by design
  */
@@ -33,10 +35,9 @@ class SetValue<T> implements pt.OptionalValue<T> {
 }
 
 /**
- * why is this not the constructor? to call a constructor, you have to use the keyword 'new'. Pareto doesn't use the concept of a class so that keyword should be avoided
+ * returns a set {@link OptionalValue}.
 
  * @param $ the set value
- * @returns a set OptionalValue
  */
 export function set<T>($: T): pt.OptionalValue<T> {
     return new SetValue($)
