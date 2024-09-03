@@ -9,8 +9,6 @@ if [ -z "$1" ]
     exit 1
 fi
 
-cd "$rootDir" && \
-
 #make sure everything is pushed
 git push && \
 
