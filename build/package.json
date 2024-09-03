@@ -1,5 +1,11 @@
 {
-  "dependencies": {
+  "scripts": {
+    "update 2 latest": "node ./node_modules/npm-updatedependencies2latest/dist/index.js ../pub dependencies",
+    "build": "./scripts/build.sh",
+    "publish patch": "./scripts/publish.sh patch",
+    "publish minor": "./scripts/publish.sh minor"
+  },
+  "devDependencies": {
     "npm-updatedependencies2latest": "^0.0.17"
   }
 }
