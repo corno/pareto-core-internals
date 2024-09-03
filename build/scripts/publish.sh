@@ -23,5 +23,16 @@ $scriptDir/build.sh && \
 git diff --exit-code && git log origin/master..master --exit-code && \
 
 pushd "$rootDir/pub" > /dev/null && \
-npm version $1 && \
+
+#bump version and store in variable
+newVersion=$(npm version "$1") && \
+
+#commit package.json with new version number
+git add --all && \
+git commit -m "version bumped to $newVersion" && \
+
+#create a tag
+git tag -a "$newVersion" -m "$newVersion" && \
+
+git push && \
 npm publish
