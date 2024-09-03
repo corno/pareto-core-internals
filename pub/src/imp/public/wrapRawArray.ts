@@ -5,8 +5,10 @@ import { Execute } from "../types/Execute"
 
 /**
  * this is an implementation, not public by design
+ * If you feel the need to rename this class, don't rename it to 'Array',
+ * it will break the 'instanceOf Array' test
  */
-class Array<T> implements pt.Array<T> {
+class ArrayClass<T> implements pt.Array<T> {
     private data: T[]
     constructor(data: T[]) {
         this.data = data
@@ -82,5 +84,5 @@ export function wrapRawArray<T>(source: T[]): pt.Array<T> {
     if (!(data instanceof Array)) {
         throw new Error("invalid input in 'createArray'")
     }
-    return new Array(source)
+    return new ArrayClass(source)
 }
